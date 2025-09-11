@@ -1,0 +1,326 @@
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.lobby-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background-color: #fcfcfc;
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.lobby-sidebar {
+  width: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}
+
+.lobby-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.lobby-header h1 {
+  margin-bottom: 1.5rem;
+}
+
+.lobby-header img {
+  max-width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.tab-bar {
+  display: flex;
+  background-color: #efefef;
+  border-radius: 8px;
+  padding: 8px;
+  gap: 10px;
+  margin-top: 2rem;
+  position: relative;
+}
+
+.tab-button {
+  flex: 1;
+  background-color: #efefef;
+  color: #666666;
+  border: none;
+  padding: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tab-button.active {
+  background-color: #d9d9d9;
+  color: #0a0a0a;
+  position: relative;
+}
+
+/* Remove the old static indicator */
+.tab-button.active::after {
+  display: none;
+}
+
+/* New animated tab indicator */
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background-color: #d53235;
+  border-radius: 100px;
+  transition: left 175ms cubic-bezier(0.3, 0.7, 0.4, 1), right 175ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tab-indicator.create {
+  left: 40px;
+  right: calc(50% + 40px);
+}
+
+.tab-indicator.join {
+  left: calc(50% + 40px);
+  right: 40px;
+}
+
+/* Grow-then-shrink animation using two-phase keyframes */
+@keyframes indicator-grow-ltr {
+  0% {
+    left: 40px;
+    right: calc(50% + 40px);
+  }
+  50% {
+    left: calc(50%-20px);
+    right: 40px; /* grow to cover both */
+  }
+  100% {
+    left: calc(50% + 40px);
+    right: 40px; /* settle on right */
+  }
+}
+
+@keyframes indicator-grow-rtl {
+  0% {
+    left: calc(50% + 40px);
+    right: 40px;
+  }
+  50% {
+    left: 40px;
+    right: calc(50%-20px); /* grow to cover both */
+  }
+  100% {
+    left: 40px;
+    right: calc(50% + 40px); /* settle on left */
+  }
+}
+
+.tab-indicator.anim-ltr {
+  animation: indicator-grow-ltr 350ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.tab-indicator.anim-rtl {
+  animation: indicator-grow-rtl 350ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.tab-button:hover:not(.active) {
+  background: #e4e4e4;
+}
+
+.lobby-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 0.5rem;
+}
+
+.lobby-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.floating-input {
+  position: relative;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform 0.2s ease;
+  color: #666666;
+}
+
+.floating-input:focus-within .select-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.floating-label {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666666;
+  font-weight: 600;
+  font-size: 12px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.form-input,
+.form-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 1rem 0.75rem;
+  background-color: #efefef;
+  color: #000000;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  min-height: 48px;
+  width: 100%;
+  min-width: 280px;
+}
+
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.5rem;
+}
+
+.form-input::placeholder {
+  color: #666666;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: rgb(0, 0, 0);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-input:focus + .floating-label,
+.form-select:focus + .floating-label,
+.form-input:not(:placeholder-shown) + .floating-label,
+.form-select:not([value=""]) + .floating-label {
+  top: 5px;
+  transform: translateX(-6%);
+}
+
+/* Error states */
+.form-input.error,
+.form-select.error {
+  background-color: #eed6f5;
+}
+
+.form-input.error:focus,
+.form-select.error:focus {
+  border-color: #b927db;
+}
+
+.form-input.error + .floating-label,
+.form-select.error + .floating-label {
+  color: #522f5d;
+}
+
+.error-message {
+  position: relative;
+  top: -17.5rem;
+  background: white;
+  line-height: 1.5rem;
+  color: #7c7c7c;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  box-shadow: 0 2px 25px rgba(0, 0, 0, 0.274);
+  text-align: center;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-message::after {
+  content: '';
+  position: absolute;
+  bottom: -7.6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
+}
+
+.form-select option {
+  background: white;
+  color: black;
+}
+
+.submit-button {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f5f5f5;
+  color: #919191;
+  border: none;
+  border-radius: 20px;  
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 65px;
+  width: 65px;
+  opacity: 0.6;
+}
+
+.submit-button:not(:disabled) {
+  background: #d53235;
+  color: #fcfcfc;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.submit-button:not(:disabled):hover {
+  background: #b82a2d;
+}
+
+.lobby-image {
+  flex: 1;
+  display: flex;
+}
+
+.lobby-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; height: 300px; overflow-y: scroll; }
+        button { margin: 5px; padding: 8px 16px; }
+        input { margin: 5px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Test</h1>
+        
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <div>
+            <button onclick="connect()">Connect</button>
+            <button onclick="disconnect()">Disconnect</button>
+        </div>
+        
+        <div>
+            <h3>Send Test Messages:</h3>
+            <button onclick="sendJoinRoom()">Join Room</button>
+            <button onclick="sendChat()">Send Chat</button>
+            <button onclick="sendDrawUpdate()">Draw Update</button>
+            <button onclick="sendGuess()">Send Guess</button>
+        </div>
+        
+        <div>
+            <h3>Custom Message:</h3>
+            <input type="text" id="customMessage" placeholder='{"type": "Chat", "room_code": "TEST12", "message": "Hello!"}' style="width: 400px;">
+            <button onclick="sendCustom()">Send</button>
+        </div>
+        
+        <div>
+            <h3>Message Log:</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStatus(connected) {
+            const statusDiv = document.getElementById('status');
+            if (connected) {
+                statusDiv.textContent = 'Connected';
+                statusDiv.className = 'status connected';
+            } else {
+                statusDiv.textContent = 'Disconnected';
+                statusDiv.className = 'status disconnected';
+            }
+        }
+        
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                log('Already connected!');
+                return;
+            }
+            
+            ws = new WebSocket('ws://localhost:3000/ws');
+            
+            ws.onopen = () => {
+                log('✅ Connected to WebSocket!');
+                updateStatus(true);
+            };
+            
+            ws.onmessage = (event) => {
+                log(`📨 Received: ${event.data}`);
+            };
+            
+            ws.onclose = () => {
+                log('❌ WebSocket closed');
+                updateStatus(false);
+            };
+            
+            ws.onerror = (error) => {
+                log(`❌ WebSocket error: ${error}`);
+                updateStatus(false);
+            };
+        }
+        
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+        
+        function sendMessage(message) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                log('❌ Not connected!');
+                return;
+            }
+            
+            const jsonMessage = JSON.stringify(message);
+            ws.send(jsonMessage);
+            log(`📤 Sent: ${jsonMessage}`);
+        }
+        
+        function sendJoinRoom() {
+            sendMessage({
+                type: "JoinRoom",
+                room_code: "TEST12",
+                username: "TestPlayer"
+            });
+        }
+        
+        function sendChat() {
+            sendMessage({
+                type: "Chat",
+                room_code: "TEST12",
+                message: "Hello from WebSocket test!"
+            });
+        }
+        
+        function sendDrawUpdate() {
+            sendMessage({
+                type: "DrawUpdate",
+                room_code: "TEST12",
+                path: {
+                    id: "test-path",
+                    strokes: [
+                        {
+                            points: [{x: 100, y: 100}, {x: 200, y: 200}],
+                            color: "#FF0000",
+                            brushSize: 2
+                        }
+                    ],
+                    created_at: new Date().toISOString()
+                }
+            });
+        }
+        
+        function sendGuess() {
+            sendMessage({
+                type: "Guess",
+                room_code: "TEST12",
+                guess: "test word"
+            });
+        }
+        
+        function sendCustom() {
+            const input = document.getElementById('customMessage');
+            try {
+                const message = JSON.parse(input.value);
+                sendMessage(message);
+            } catch (e) {
+                log(`❌ Invalid JSON: ${e.message}`);
+            }
+        }
+        
+        // Auto-connect on page load
+        window.onload = () => {
+            log('Page loaded. Click "Connect" to start testing.');
+        };
+    </script>
+</body>
+</html>

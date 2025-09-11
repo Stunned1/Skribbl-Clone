@@ -1,0 +1,117 @@
+Core Features
+
+Room Management
+
+Create new game rooms
+
+Join existing rooms via room code
+
+Leave rooms gracefully
+
+Player Management
+
+Temporary player IDs (via UUID)
+
+Reconnect support if a player crashes or closes tab (as long as room still exists)
+
+Track player state: username, score, connected/disconnected
+
+Gameplay
+
+One player draws on a canvas each round
+
+Other players guess in real-time via chat
+
+Word pool system to assign drawing prompts
+
+Turn rotation between players
+
+Timers per round to keep game moving
+
+Scoring System
+
+Points awarded for correct guesses (more points if guessed faster)
+
+Drawer gets points for correct guesses by others
+
+End game after N rounds or when a score threshold is reached
+
+Real-Time Functionality
+
+WebSocket server for live updates:
+
+Drawing strokes broadcast to room
+
+Guess/chat messages broadcast in real time
+
+Player join/leave notifications
+
+Handle disconnections:
+
+Mark player as disconnected
+
+Allow rejoin if they still have an active UUID and room exists
+
+Sync game state across all connected clients
+
+Frontend (React + TS)
+
+Lobby screen:
+
+Create/join room
+
+See player list before game starts
+
+Game screen:
+
+Canvas for drawing
+
+Chat/guess input box
+
+Scoreboard
+
+Timer + current drawer indicator
+
+Word display (for drawer only)
+
+Leave/rejoin prompts:
+
+“Do you want to rejoin your last game?”
+
+“Are you sure you want to leave?”
+
+Backend (Rust + Axum)
+
+REST endpoints:
+
+/createRoom
+
+/joinRoom
+
+/leaveRoom
+
+(maybe /health for testing)
+
+WebSocket handling:
+
+Message types (joinRoom, drawUpdate, guess, chat, nextTurn, endRound, etc.)
+
+State updates sent to all players in the room
+
+In-memory state management (HashMap/DashMap for rooms and players)
+
+Async tasks:
+
+Timers for turns/rounds
+
+Cleanup jobs for inactive rooms/players
+
+Persistence
+
+No permanent database (state lives only in memory)
+
+Player UUID stored in localStorage for reconnects
+
+Backend keeps player state tied to UUID until room ends
+
+Rooms and players wiped when game finishes or everyone leaves
