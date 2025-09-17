@@ -624,7 +624,7 @@ export const GameRoom: React.FC<GameRoomProps> = ({ room, currentPlayer, onLeave
         border: '1px solid #dee2e6'
       }}>
         <div style={{ fontWeight: 'bold', color: '#495057' }}>
-          {isDrawer ? '🎨 You are drawing!' : '👀 You are guessing!'}
+          {isDrawer ? 'You are drawing!' : 'You are guessing!'}
         </div>
         {/* Artist word and round counter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -733,7 +733,7 @@ export const GameRoom: React.FC<GameRoomProps> = ({ room, currentPlayer, onLeave
           fontWeight: 'bold',
           fontSize: '16px'
         }}>
-          🎯 Drawing: {selectedWord}
+          Drawing: {selectedWord}
         </div>
       )}
 

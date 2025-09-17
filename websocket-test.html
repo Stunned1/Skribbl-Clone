@@ -74,21 +74,21 @@
             ws = new WebSocket('ws://localhost:3000/ws');
             
             ws.onopen = () => {
-                log('✅ Connected to WebSocket!');
+                log('Connected to WebSocket!');
                 updateStatus(true);
             };
             
             ws.onmessage = (event) => {
-                log(`📨 Received: ${event.data}`);
+                log(`Received: ${event.data}`);
             };
             
             ws.onclose = () => {
-                log('❌ WebSocket closed');
+                log('WebSocket closed');
                 updateStatus(false);
             };
             
             ws.onerror = (error) => {
-                log(`❌ WebSocket error: ${error}`);
+                log(`WebSocket error: ${error}`);
                 updateStatus(false);
             };
         }
@@ -102,13 +102,13 @@
         
         function sendMessage(message) {
             if (!ws || ws.readyState !== WebSocket.OPEN) {
-                log('❌ Not connected!');
+                log('Not connected!');
                 return;
             }
             
             const jsonMessage = JSON.stringify(message);
             ws.send(jsonMessage);
-            log(`📤 Sent: ${jsonMessage}`);
+            log(`Sent: ${jsonMessage}`);
         }
         
         function sendJoinRoom() {
@@ -159,7 +159,7 @@
                 const message = JSON.parse(input.value);
                 sendMessage(message);
             } catch (e) {
-                log(`❌ Invalid JSON: ${e.message}`);
+                log(`Invalid JSON: ${e.message}`);
             }
         }
         

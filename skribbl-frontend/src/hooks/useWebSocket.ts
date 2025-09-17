@@ -37,7 +37,7 @@ export const useWebSocket = (options: UseWebSocketOptions = {}): UseWebSocketRet
   }, []);
 
   const disconnect = useCallback(() => {
-    console.log('🔥 disconnect() called');
+    console.log('disconnect() called');
     websocketManager.disconnect();
     setIsConnected(false);
     setError(null);

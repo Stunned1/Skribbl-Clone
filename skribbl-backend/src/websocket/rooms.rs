@@ -244,7 +244,7 @@ pub async fn handle_start_game(
         room.round_start_time = None; // No round start time until word is selected
         room.round_end_time = None; // No round end time until word is selected
         
-        println!("🎮 Game started in room {}: Round {}, Cycle {} of {}, Drawer: {} (Max Cycles: {})", 
+        println!("Game started in room {}: Round {}, Cycle {} of {}, Drawer: {} (Max Cycles: {})", 
                 room_code, room.round_number, room.cycle_number, room.max_rounds,
                 room.players.get(&drawer_id).map(|p| &p.username).unwrap_or(&"Unknown".to_string()),
                 room.max_rounds);
@@ -274,7 +274,7 @@ pub async fn handle_start_game(
         // Send filtered room state so non-winners don't see the word or winners chat
         state.broadcast_room_state_filtered(room_code);
         
-        println!("✅ Game started in room {} - waiting for player to select word", room_code);
+        println!("Game started in room {} - waiting for player to select word", room_code);
     } else {
         let error_msg = crate::models::ServerMessage::Error {
             message: "Room not found".to_string(),
@@ -291,11 +291,11 @@ pub async fn handle_end_round(
     room_code: &str,
     _tx: &UnboundedSender<Message>,
 ) {
-    println!("🔄 handle_end_round called for room: {}", room_code);
+    println!("handle_end_round called for room: {}", room_code);
     
     // Full round end: compute scores, update players, rotate drawer, reset round state, and broadcast next round
     if let Some(room) = state.get_room(room_code) {
-        println!("✅ Room found, proceeding with round end logic");
+        println!("Room found, proceeding with round end logic");
         // Calculate scores using the scoring system
         let potential_guessers = room.players.len().saturating_sub(1);
         let artist_streak = room
@@ -323,16 +323,16 @@ pub async fn handle_end_round(
         super::chat::update_player_scores(state, room_code, &scores).await;
 
         // Rotate drawer and reset round state for next round
-        println!("🔄 About to rotate drawer and update cycle logic");
+        println!("About to rotate drawer and update cycle logic");
         if let Some(mut r2) = state.get_room(room_code) {
-            println!("✅ Got room for cycle logic, proceeding with drawer rotation");
+            println!("Got room for cycle logic, proceeding with drawer rotation");
             // Determine ordered players by joined_at
             let mut ordered: Vec<_> = r2.players.values().cloned().collect();
             ordered.sort_by(|a, b| a.joined_at.cmp(&b.joined_at));
             
             // Safety check: ensure we have players
             if ordered.is_empty() {
-                println!("⚠️  ERROR: No players in room {} during round end", room_code);
+                println!("ERROR: No players in room {} during round end", room_code);
                 return;
             }
             
@@ -350,26 +350,26 @@ pub async fn handle_end_round(
                 let cur_idx = ordered.iter().position(|p| p.id == cur).unwrap_or(0);
                 let next_idx = (cur_idx + 1) % ordered.len();
                 let will_be_new_cycle = next_idx == 0; // If next drawer is first player, it's a new cycle
-                println!("🔄 Cycle check: current_idx={}, next_idx={}, players_total={}, will_be_new_cycle={}", 
+                println!("Cycle check: current_idx={}, next_idx={}, players_total={}, will_be_new_cycle={}", 
                         cur_idx, next_idx, ordered.len(), will_be_new_cycle);
                 will_be_new_cycle
             } else {
                 false
             };
 
-            println!("📊 Before update - Round: {}, Cycle: {}, Max Cycles: {}", 
+            println!("Before update - Round: {}, Cycle: {}, Max Cycles: {}", 
                     r2.round_number, r2.cycle_number, r2.max_rounds);
 
             // Increment round number and cycle number if needed
             if is_new_cycle {
                 r2.cycle_number = r2.cycle_number.saturating_add(1);
                 r2.round_number = 1; // Reset to 1 for new cycle
-                println!("🎯 New cycle started! Cycle {} of {} (max cycles)", r2.cycle_number, r2.max_rounds);
+                println!("New cycle started! Cycle {} of {} (max cycles)", r2.cycle_number, r2.max_rounds);
             } else {
                 r2.round_number = r2.round_number.saturating_add(1); // Increment round within cycle
             }
             
-            println!("📊 After update - Round: {}, Cycle: {}, Max Cycles: {}", 
+            println!("After update - Round: {}, Cycle: {}, Max Cycles: {}", 
                     r2.round_number, r2.cycle_number, r2.max_rounds);
             
             // CRITICAL FIX: Additional cycle progression logic
@@ -379,12 +379,12 @@ pub async fn handle_end_round(
                 // We've exceeded the number of players in this cycle, force a new cycle
                 r2.cycle_number = r2.cycle_number.saturating_add(1);
                 r2.round_number = 1; // Reset to 1 for new cycle
-                println!("🎯 Force new cycle! Round {} > {} players, Cycle {} of {} (max cycles)", 
+                println!("Force new cycle! Round {} > {} players, Cycle {} of {} (max cycles)", 
                         r2.round_number, players_count, r2.cycle_number, r2.max_rounds);
             }
             
             // Enhanced debugging: Log the complete state after all updates
-            println!("🔍 Final state after cycle logic:");
+            println!("Final state after cycle logic:");
             println!("   - Players count: {}", players_count);
             println!("   - Round number: {}", r2.round_number);
             println!("   - Cycle number: {}", r2.cycle_number);
@@ -412,7 +412,7 @@ pub async fn handle_end_round(
             
             // Log round completion
             println!(
-                "🎮 Round {} complete. Current drawer: {}, Next drawer: {}, Cycle: {} of {}",
+                "Round {} complete. Current drawer: {}, Next drawer: {}, Cycle: {} of {}",
                 r2.round_number, current_drawer_name, next_drawer_name, r2.cycle_number, r2.max_rounds
             );
             
@@ -429,7 +429,7 @@ pub async fn handle_end_round(
 
             // Check if game should end (max cycles reached)
             if r2.cycle_number > r2.max_rounds {
-                println!("🏁 Game ending: Cycle {} > Max Cycles {} - Game Over!", r2.cycle_number, r2.max_rounds);
+                println!("Game ending: Cycle {} > Max Cycles {} - Game Over!", r2.cycle_number, r2.max_rounds);
                 // Game over - broadcast final scores
                 r2.game_state = crate::models::GameState::Finished;
                 if let Err(e) = state.update_room(room_code, r2.clone()) {
@@ -473,19 +473,19 @@ pub async fn handle_word_selected(
     if let Some(mut room) = state.get_room(room_code) {
         // Check if a word is already selected for this round
         if room.word.is_some() {
-            println!("⚠️  Word already selected in room {}, ignoring new selection: {}", room_code, word);
+            println!("Word already selected in room {}, ignoring new selection: {}", room_code, word);
             return;
         }
         
         // Check if the game is in playing state
         if room.game_state != crate::models::GameState::Playing {
-            println!("⚠️  Game not in playing state in room {}, ignoring word selection: {}", room_code, word);
+            println!("Game not in playing state in room {}, ignoring word selection: {}", room_code, word);
             return;
         }
         
         // Check if there's a current drawer
         if room.current_drawer.is_none() {
-            println!("⚠️  No current drawer in room {}, ignoring word selection: {}", room_code, word);
+            println!("No current drawer in room {}, ignoring word selection: {}", room_code, word);
             return;
         }
         
@@ -499,7 +499,7 @@ pub async fn handle_word_selected(
             return;
         }
         
-        println!("✅ Word selected in room {}: {} (starting {}s timer)", room_code, word, room.round_duration);
+        println!("Word selected in room {}: {} (starting {}s timer)", room_code, word, room.round_duration);
         
         // Start backend timer to end round automatically
         // Note: This timer will be the only active timer for this round

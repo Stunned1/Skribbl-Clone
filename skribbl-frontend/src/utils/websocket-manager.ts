@@ -63,7 +63,7 @@ class WebSocketManager {
         };
 
         this.ws.onclose = (event) => {
-          console.log('🔴 WebSocket CLOSED:', event.code, event.reason);
+          console.log('WebSocket CLOSED:', event.code, event.reason);
           this.isConnected = false;
           
           // Attempt to reconnect after a delay
@@ -89,7 +89,7 @@ class WebSocketManager {
   }
 
   disconnect() {
-    console.log('🔥 disconnect() called');
+    console.log('disconnect() called');
     
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
@@ -97,7 +97,7 @@ class WebSocketManager {
     }
 
     if (this.ws) {
-      console.log('🔥 Closing WebSocket connection');
+      console.log('Closing WebSocket connection');
       this.ws.close(1000, 'User disconnected');
       this.ws = null;
     }

@@ -215,26 +215,26 @@ async fn handle_round_end(state: &AppState, room_code: &str) {
                 let cur_idx = ordered.iter().position(|p| p.id == cur).unwrap_or(0);
                 let next_idx = (cur_idx + 1) % ordered.len();
                 let will_be_new_cycle = next_idx == 0; // If next drawer is first player, it's a new cycle
-                println!("🔄 Cycle check: current_idx={}, next_idx={}, players_total={}, will_be_new_cycle={}", 
+                println!("Cycle check: current_idx={}, next_idx={}, players_total={}, will_be_new_cycle={}", 
                         cur_idx, next_idx, ordered.len(), will_be_new_cycle);
                 will_be_new_cycle
             } else {
                 false
             };
 
-            println!("📊 Before update - Round: {}, Cycle: {}, Max Cycles: {}", 
+            println!("Before update - Round: {}, Cycle: {}, Max Cycles: {}", 
                     r2.round_number, r2.cycle_number, r2.max_rounds);
 
             // Increment round number and cycle number if needed
             if is_new_cycle {
                 r2.cycle_number = r2.cycle_number.saturating_add(1);
                 r2.round_number = 1; // Reset to 1 for new cycle
-                println!("🎯 New cycle started! Cycle {} of {} (max cycles)", r2.cycle_number, r2.max_rounds);
+                println!("New cycle started! Cycle {} of {} (max cycles)", r2.cycle_number, r2.max_rounds);
             } else {
                 r2.round_number = r2.round_number.saturating_add(1); // Increment round within cycle
             }
             
-            println!("📊 After update - Round: {}, Cycle: {}, Max Cycles: {}", 
+            println!("After update - Round: {}, Cycle: {}, Max Cycles: {}", 
                     r2.round_number, r2.cycle_number, r2.max_rounds);
             
             // CRITICAL FIX: Additional cycle progression logic
@@ -244,12 +244,12 @@ async fn handle_round_end(state: &AppState, room_code: &str) {
                 // We've exceeded the number of players in this cycle, force a new cycle
                 r2.cycle_number = r2.cycle_number.saturating_add(1);
                 r2.round_number = 1; // Reset to 1 for new cycle
-                println!("🎯 Force new cycle! Round {} > {} players, Cycle {} of {} (max cycles)", 
+                println!("Force new cycle! Round {} > {} players, Cycle {} of {} (max cycles)", 
                         r2.round_number, players_count, r2.cycle_number, r2.max_rounds);
             }
             
             // Enhanced debugging: Log the complete state after all updates
-            println!("🔍 Final state after cycle logic:");
+            println!("Final state after cycle logic:");
             println!("   - Players count: {}", players_count);
             println!("   - Round number: {}", r2.round_number);
             println!("   - Cycle number: {}", r2.cycle_number);
@@ -271,7 +271,7 @@ async fn handle_round_end(state: &AppState, room_code: &str) {
                 &unknown_str
             };
             println!(
-                "🎮 Round {} complete. Current drawer: {}, Next drawer: {}, Cycle: {} of {}",
+                "Round {} complete. Current drawer: {}, Next drawer: {}, Cycle: {} of {}",
                 r2.round_number, current_drawer_name, next_drawer_name, r2.cycle_number, r2.max_rounds
             );
             
@@ -298,7 +298,7 @@ async fn handle_round_end(state: &AppState, room_code: &str) {
 
             // Check if game should end (max cycles reached)
             if r2.cycle_number > r2.max_rounds {
-                println!("🏁 Game ending: Cycle {} > Max Cycles {} - Game Over!", r2.cycle_number, r2.max_rounds);
+                println!("Game ending: Cycle {} > Max Cycles {} - Game Over!", r2.cycle_number, r2.max_rounds);
                 // Game over - broadcast final scores
                 r2.game_state = crate::models::GameState::Finished;
                 if let Err(e) = state.update_room(room_code, r2.clone()) {
